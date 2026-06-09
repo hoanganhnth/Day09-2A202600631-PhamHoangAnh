@@ -172,18 +172,43 @@ def check_compliance_requirements(industry: str, company_size: str) -> str:
     )
 
 
-TOOLS = [search_legal_database, calculate_penalty, check_compliance_requirements]
+@tool
+def search_case_law(keywords: str) -> str:
+    """Find relevant case law by keywords.
 
-QUESTION = (
-    "A tech startup with $5M revenue was caught sharing user data without consent "
-    "and failed to pay taxes on overseas revenue. What are all the legal consequences?"
-)
+    Args:
+        keywords: Search keywords for the case law lookup.
+    """
+    cases = {
+        "breach": "Hadley v. Baxendale (1854) - Consequential damages",
+        "negligence": "Donoghue v. Stevenson (1932) - Duty of care",
+        "contract": "Carlill v. Carbolic Smoke Ball Co (1893) - Unilateral contract",
+    }
+    query = keywords.lower()
+    matches = [case for key, case in cases.items() if key in query]
+    if not matches:
+        return "Không tìm thấy án lệ phù hợp"
+    return "\n".join(matches)
+
+
+TOOLS = [
+    search_legal_database,
+    search_case_law,
+    calculate_penalty,
+    check_compliance_requirements,
+]
+QUESTION = "What case law applies to breach of contract?"
+# QUESTION = (
+#     "A tech startup with $5M revenue was caught sharing user data without consent "
+#     "and failed to pay taxes on overseas revenue. What are all the legal consequences?"
+# )
 
 SYSTEM_PROMPT = (
     "You are a legal analyst agent. You have access to tools for searching legal databases, "
-    "calculating penalties, and checking compliance requirements. Use these tools to build "
-    "a comprehensive analysis. Search for each legal area separately — data privacy, tax, "
-    "and compliance. Keep your final answer under 500 words."
+    "searching case law, calculating penalties, and checking compliance requirements. Use "
+    "these tools to build a comprehensive analysis. Search for each legal area separately — "
+    "data privacy, tax, compliance, and relevant case law when contract issues appear. "
+    "Keep your final answer under 500 words."
 )
 
 
